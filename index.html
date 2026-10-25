@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova AI Assistant | Intelligent Conversational Bot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .intents-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+
+        .intent-item {
+            background-color: var(--bg-card);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .intent-item:hover {
+            border-color: var(--accent);
+            background-color: #3b4252;
+        }
+
+        .intent-title {
+            font-weight: 500;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .intent-cat {
+            font-size: 10px;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Main Chat Area */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-primary);
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 18px 24px;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header-info h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chat-header-info p {
+            font-size: 12px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chat-header-info p::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--border);
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            display: flex;
+            gap: 14px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .message.bot .avatar {
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            color: white;
+        }
+
+        .message.user .avatar {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .message-content {
+            background-color: var(--bg-secondary);
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid var(--border);
+        }
+
+        .message.user .message-content {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .meta-info {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 18px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            width: fit-content;
+            border: 1px solid var(--border);
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+
+        /* Quick suggestions */
+        .suggestions {
+            padding: 12px 24px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            background-color: var(--bg-primary);
+        }
+
+        .suggestion-chip {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #cbd5e1;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .suggestion-chip:hover {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Input Area */
+        .chat-input-area {
+            padding: 20px 24px;
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--accent);
+        }
+
+        .send-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background-color: var(--accent-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo-area">
+            <div class="logo-icon">
+                <i class="fa-solid fa-sparkles"></i>
+            </div>
+            <div class="logo-text">
+                <h1>Nova AI</h1>
+                <p>Conversational Agent</p>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-title">Topics & Inquiries</div>
+            <div class="intents-list" id="intentsList">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <h2>Nova Assistant</h2>
+                <p>Online & Ready to Chat</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn" onclick="clearChat()">
+                    <i class="fa-solid fa-rotate-right"></i> Reset Chat
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <div class="message-content">
+                        Hello! I am Nova, your intelligent AI companion. You can chat with me about anything, ask general questions, or get support regarding our website services. What would you like to talk about today?
+                    </div>
+                    <div class="meta-info">
+                        <span>Topic: greeting</span>
+                        <span>Confidence: 100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div style="padding: 0 24px;">
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <span style="font-size: 12px; color: var(--text-muted); margin-left: 6px;">Nova is thinking...</span>
+            </div>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="suggestions" id="suggestions">
+            <div class="suggestion-chip" onclick="sendPreset('Hello! Who are you?')">👋 Hi, who are you?</div>
+            <div class="suggestion-chip" onclick="sendPreset('Tell me a funny joke')">😄 Tell me a joke</div>
+            <div class="suggestion-chip" onclick="sendPreset('How do I cancel my order?')">🛍️ Cancel Order</div>
+            <div class="suggestion-chip" onclick="sendPreset('Where is my package?')">📦 Track Order</div>
+            <div class="suggestion-chip" onclick="sendPreset('How do I get a refund?')">💳 Refund Request</div>
+            <div class="suggestion-chip" onclick="sendPreset('How can I speak to a live human?')">🎧 Live Support</div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="userInput" placeholder="Ask or chat about anything..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Load Intents on startup
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch('/api/intents');
+                const data = await res.json();
+                const list = document.getElementById('intentsList');
+                list.innerHTML = '';
+                data.intents.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'intent-item';
+                    div.onclick = () => sendPreset(item.examples[0]);
+                    div.innerHTML = `
+                        <div class="intent-title">
+                            <span>${item.intent}</span>
+                            <span class="intent-cat">${item.category}</span>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch (err) {
+                console.error("Failed to load intents", err);
+            }
+        });
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendPreset(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const messageText = input.value.trim();
+            if (!messageText) return;
+
+            input.value = '';
+            appendMessage(messageText, 'user');
+
+            const typing = document.getElementById('typingIndicator');
+            typing.style.display = 'flex';
+
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: messageText })
+                });
+                const data = await res.json();
+
+                typing.style.display = 'none';
+                appendBotMessage(data.response, data.intent, data.confidence, data.latency_ms);
+            } catch (err) {
+                typing.style.display = 'none';
+                appendBotMessage("Sorry, I encountered an error connecting to the AI server.", "error", 0.0, 0);
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            div.innerHTML = `
+                <div class="avatar"><i class="fa-solid ${sender === 'user' ? 'fa-user' : 'fa-robot'}"></i></div>
+                <div>
+                    <div class="message-content">${escapeHtml(text)}</div>
+                </div>
+            `;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function appendBotMessage(text, intent, confidence, latency) {
+            const chatMessages = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = 'message bot';
+            div.innerHTML = `
+                <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <div class="message-content">${escapeHtml(text)}</div>
+                    <div class="meta-info">
+                        <span>Topic: ${escapeHtml(intent)}</span>
+                        <span>Confidence: ${(confidence * 100).toFixed(1)}%</span>
+                        <span>Latency: ${latency}ms</span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function clearChat() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = `
+                <div class="message bot">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div>
+                        <div class="message-content">Chat history reset. What would you like to chat about?</div>
+                        <div class="meta-info">
+                            <span>Topic: reset</span>
+                            <span>Confidence: 100%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>
